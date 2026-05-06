@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Gioco Foscolo</title>
+<style>
+body{
+#puzzle button{
+  min-width:260px;
+  padding:18px 22px;
+
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+
+  border-radius:16px;
+
+  color:white;
+  font-size:18px;
+  font-weight:500;
+
+  margin:10px;
+
+  cursor:pointer;
+
+  transition: all 0.3s ease;
+  position: relative;
+  overflow:hidden;
+}
+.progress{
+  width:100%;
+  height:12px;
+  background:#1e293b;
+  border-radius:20px;
+  margin-bottom:25px;
+  overflow:hidden;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg,#22c55e,#4ade80);
+  transition:0.4s ease;
+  box-shadow: 0 0 12px rgba(34,197,94,0.7);
+}
+
+/* hover bello */
+#puzzle button:hover{
+  transform: translateY(-5px) scale(1.03);
+  background: rgba(99,102,241,0.25);
+  border-color: rgba(99,102,241,0.6);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* click effetto */
+#puzzle button:active{
+  transform: scale(0.97);
+}
+
+/* luce che scorre */
+#puzzle button::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:100%;
+  height:100%;
+  background: linear-gradient(120deg,transparent,rgba(255,255,255,0.15),transparent);
+  transition:0.5s;
+}
+
+#puzzle button:hover::before{
+  left:120%;
+}
+
+/* selezionato (aggiungiamo classe via JS dopo) */
+.selected{
+  background: rgba(34,197,94,0.25) !important;
+  border-color: #22c55e !important;
+  box-shadow: 0 0 20px rgba(34,197,94,0.4);
+}
+.home-btn{
+  position: fixed;
+  top: 15px;
+  left: 15px;
+
+  width: 45px;
+  height: 45px;
+
+  background: #6366f1;
+  border-radius: 12px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-decoration: none;
+
+  transition: 0.3s;
+  z-index: 999;
+}
+
+.home-btn:hover{
+  transform: scale(1.1);
+  background: #4f46e5;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* ICONA */
+.home-icon{
+  width: 22px;
+  height: 22px;
+  fill: white;
+}
+  font-family: Montserrat, sans-serif;
+  background: linear-gradient(135deg,#0f172a,#1e293b);
+  color:white;
+  text-align:center;
+  padding:40px;
+  margin:0;
+
+  opacity:0;
+  animation: pageIn 0.8s ease forwards;
+}
+
+@keyframes pageIn{
+  to{opacity:1;}
+}
+
+/* TITOLI */
+h2{
+  animation: fadeDown 0.8s ease forwards;
+  opacity:0;
+  transform: translateY(-20px);
+}
+
+@keyframes fadeDown{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* BOTTONI GENERALI */
+button{
+  padding:14px 20px;
+  margin:8px;
+  background:#22c55e;
+  border:none;
+  border-radius:10px;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+
+  transition: all 0.25s ease;
+}
+
+button:hover{
+  transform:scale(1.06);
+  background:#16a34a;
+}
+
+button:active{
+  transform:scale(0.95);
+}
+
+/* PUZZLE BOX */
+#puzzle button{
+  min-width:220px;
+  display:inline-block;
+  animation: popIn 0.4s ease forwards;
+}
+
+@keyframes popIn{
+  from{
+    opacity:0;
+    transform:scale(0.8);
+  }
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+/* QUIZ BOX ANIMAZIONE */
+#quizBox{
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* RISULTATI */
+#puzzleResult, #quizResult{
+  margin-top:20px;
+  font-size:18px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+/* LINK HOME */
+.linkgame{
+  display:inline-block;
+  padding:12px 18px;
+  background:#6366f1;
+  border-radius:10px;
+  text-decoration:none;
+  color:white;
+  transition:0.3s;
+}
+
+.linkgame:hover{
+  transform:scale(1.05);
+  background:#4f46e5;
+}
+#hintText{
+  margin-top:15px;
+  font-size:18px;
+  color:#facc15;
+}
+
+</style>
+</head>
+
+<body>
+
+<section>
+<a class="home-btn" href="index.html" title="Home">
+  <svg viewBox="0 0 24 24" class="home-icon">
+    <path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8z"/>
+  </svg>
+</a>
+</section>
+
+<h1>BENVENUTO NEI GIOCHI FOSCOLIANI</h1>
+<h2>Buon divertimento!</h2>
+
+<!-- PUZZLE -->
+<section>
+<p>Ricostruisci la vita di Foscolo</p>
+<div id="puzzle"></div>
+<p id="hintText"></p>
+<p id="puzzleResult"></p>
+<button id="hintBtn">💡 Suggerimenti (5/5)</button>
+</section>
+<br>
+<br>
+<br>
+
+<!-- QUIZ -->
+<section>
+
+<h1>Quiz finale su Foscolo</h1>
+<div id="quizBox"></div>
+<p id="quizResult"></p>
+</section>
+
+<script>
+
+/* ================= PUZZLE ================= */
+
+const stepsOrdine = [
+  "Zante",
+  "Trasferimento a Venezia",
+  "Studi e formazione culturale",
+  "Ideali rivoluzionari",
+  "Trattato di Campoformio",
+  "Delusione verso Napoleone",
+  "Scrittura dell'Ortis",
+  "Attività militare",
+  "Esilio dalla patria",
+  "Permanenza in Svizzera",
+  "Trasferimento in Inghilterra",
+  "Attività letteraria finale",
+  "Morte a Londra (1827)"
+
+];
+let selected = [];
+let hintsLeft = 5;
+
+function updateHintButton(){
+  document.getElementById("hintBtn").innerText =
+  `💡 Suggerimenti (${hintsLeft}/5)`;
+}
+function giveHint(){
+  const box = document.getElementById("hintText");
+
+  if(hintsLeft <= 0){
+    box.innerHTML = "❌ Hai finito i suggerimenti!";
+    return;
+  }
+
+  let wrongIndex = selected.findIndex((step, i) => step !== stepsOrdine[i]);
+
+  if(wrongIndex === -1){
+    box.innerHTML = " Nessun errore al momento ";
+    return;
+  }
+
+  const stepCorrect = stepsOrdine[wrongIndex];
+
+  box.innerHTML = ` Posizione ${wrongIndex + 1}: dovrebbe essere <b>${stepCorrect}</b>`;
+
+  hintsLeft--;
+  updateHintButton();
+}
+document.getElementById("hintBtn").addEventListener("click", giveHint);
+function renderPuzzle(){
+    const puzzleDiv = document.getElementById('puzzle');
+
+    let shuffled = [...stepsOrdine];
+    for(let i = shuffled.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    puzzleDiv.innerHTML = '';
+
+    shuffled.forEach(step => {
+        const btn = document.createElement('button');
+        btn.innerText = step;
+
+        //PASSO IL BOTTONE STESSO
+        btn.onclick = () => selectStep(step, btn);
+
+        puzzleDiv.appendChild(btn);
+    });
+}
+
+function selectStep(step, btn){
+
+    if(selected.includes(step)){
+        selected = selected.filter(s => s !== step);
+        btn.classList.remove("selected");
+    } else {
+        selected.push(step);
+        btn.classList.add("selected");
+    }
+
+    const resultDiv = document.getElementById('puzzleResult');
+
+    resultDiv.innerHTML =
+    `Hai scelto ${selected.length}/${stepsOrdine.length}<br>
+    ${selected.join(' → ')}`;
+
+    //CONTROLLO FINALE
+    if(selected.length === stepsOrdine.length){
+
+        let correct = true;
+
+        for(let i = 0; i < stepsOrdine.length; i++){
+            if(selected[i] !== stepsOrdine[i]){
+                correct = false;
+                break;
+            }
+        }
+
+        if(correct){
+            resultDiv.innerHTML = "Ordine corretto!";
+            resultDiv.style.color = "#22c55e";
+
+            // reset dopo poco
+            setTimeout(() => {
+                selected = [];
+                renderPuzzle();
+                resultDiv.innerHTML = "";
+            }, 8000);
+
+        } else {
+            resultDiv.innerHTML = "Ordine sbagliato!";
+            resultDiv.style.color = "#ef4444";
+
+            //RESET SUBITO (quello che vuoi)
+            setTimeout(() => {
+                selected = [];
+                renderPuzzle();
+                resultDiv.innerHTML = "";
+            },  1900);
+        }
+    }
+}
+
+// inizializza puzzle alla prima esecuzione
+renderPuzzle();
+</script>
+<br>
+</br>
+
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Quiz completo · Ugo Foscolo | Valutazione finale e consigli di ripasso</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            padding: 2rem 1.2rem;
+            line-height: 1.5;
+        }
+        .quiz-final-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .hero h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, #86efac, #22c55e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .hero p {
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+        .quiz-master-card {
+            background: #1e293b;
+            border-radius: 36px;
+            padding: 1.8rem;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.4);
+            margin-bottom: 2rem;
+        }
+        .question-block {
+            background: #0f172a;
+            border-radius: 28px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1.5rem;
+            transition: 0.1s;
+            border-left: 4px solid #22c55e;
+        }
+        .question-text {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+        .options-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+        }
+        .opt-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #1e293b;
+            padding: 0.6rem 1rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid #334155;
+        }
+        .opt-label:hover {
+            background: #2d3a4e;
+            border-color: #22c55e;
+        }
+        .opt-label input {
+            accent-color: #22c55e;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .feedback-single {
+            margin-top: 0.6rem;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        .correct-feedback {
+            color: #86efac;
+            background: #16653440;
+            border-left: 3px solid #22c55e;
+            padding-left: 0.8rem;
+        }
+        .wrong-feedback {
+            color: #f87171;
+            background: #7f1d1d40;
+            border-left: 3px solid #f87171;
+            padding-left: 0.8rem;
+        }
+        .quiz-actions {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            margin: 1.5rem 0 1rem;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #22c55e;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0f172a;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        button.reset-btn {
+            background: #475569;
+            color: white;
+        }
+        button:hover {
+            transform: scale(1.02);
+            background: #4ade80;
+        }
+        .result-area {
+            background: #0f172a;
+            border-radius: 32px;
+            padding: 1.5rem;
+            margin-top: 1.8rem;
+            border: 1px solid #22c55e60;
+        }
+        .score-badge {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .evaluation-text {
+            background: #1e293b;
+            padding: 1rem 1.4rem;
+            border-radius: 24px;
+            margin-bottom: 1.2rem;
+            font-style: normal;
+            line-height: 1.5;
+        }
+        .review-section {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 1rem 1.4rem;
+        }
+        .review-section h3 {
+            color: #86efac;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+        .review-list {
+            padding-left: 1.2rem;
+        }
+        .review-list li {
+            margin-bottom: 0.4rem;
+        }
+        hr {
+            border-color: #334155;
+            margin: 0.8rem 0;
+        }
+        .tag-module {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: #22c55e30;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            margin-bottom: 0.6rem;
+            color: #bbf7d0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+        @media (max-width: 700px) {
+            .quiz-master-card { padding: 1rem; }
+            .question-block { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-final-wrapper">
+    <div class="hero">
+        <h1>Verifica su Foscolo · Tutti i quiz in uno</h1>
+        <p>20 domande su <strong>Ortis · Dei Sepolcri · Sonetti · Le Grazie</strong> — valutazione completa e consigli di ripasso</p>
+    </div>
+
+    <div class="quiz-master-card" id="quizContainer">
+        <!-- le domande verranno injectate qui da JS -->
+    </div>
+
+    <div class="quiz-actions">
+        <button id="submitAllBtn">CORREGGI TUTTO & VALUTA</button>
+        <button id="resetAllBtn" class="reset-btn">⟳ RESET TUTTE LE RISPOSTE</button>
+    </div>
+
+    <div id="resultPanel" class="result-area" style="display: none;">
+        <!-- risultati dinamici: punteggio, valutazione, punti deboli, suggerimenti di studio -->
+    </div>
+    <footer>Quiz basato sulle opere di Ugo Foscolo · Ogni domanda ha una sola risposta corretta. Dopo la correzione riceverai un feedback personalizzato.</footer>
+</div>
+
+<script>
+    // ----- BANCA DATI COMPLETA (20 domande, con modulo di appartenenza) -----
+    const questionsDB = [
+        // ORTIS (5)
+        { module: "Ortis", text: "Di che genere è *Le ultime lettere di Jacopo Ortis*?", options: ["Romanzo storico", "Romanzo epistolare", "Poema epico", "Commedia"], correct: 1 },
+        { module: "Ortis", text: "Perché Jacopo Ortis si suicida?", options: ["Solo per amore", "Solo per motivi economici", "Persecuzione politica e amore impossibile", "Per un duello"], correct: 2 },
+        { module: "Ortis", text: "Chi raccoglie e pubblica le lettere di Jacopo dopo la sua morte?", options: ["Teresa", "Odoardo", "Lorenzo Alderani", "Parini"], correct: 2 },
+        { module: "Ortis", text: "Quale evento storico segna il crollo degli ideali di Jacopo?", options: ["Morte di Napoleone", "Trattato di Campoformio (1797)", "Rivoluzione francese", "Caduta dell'Impero romano"], correct: 1 },
+        { module: "Ortis", text: "Jacopo Ortis è definito un tipico:", options: ["Eroe classico", "Eroe romantico", "Antieroe", "Filosofo stoico"], correct: 1 },
+        // DEI SEPOLCRI (5)
+        { module: "Dei Sepolcri", text: "In che anno fu composto *Dei Sepolcri*?", options: ["1797", "1802", "1807", "1816"], correct: 2 },
+        { module: "Dei Sepolcri", text: "A quale editto napoleonico risponde il carme?", options: ["Editto di Fontainebleau", "Editto di Saint-Cloud", "Codice civile", "Editto di Milano"], correct: 1 },
+        { module: "Dei Sepolcri", text: "Secondo Foscolo, a chi servono realmente le tombe?", options: ["Ai morti", "Ai vivi", "Alla Chiesa", "Allo Stato"], correct: 1 },
+        
+        
+        // SONETTI (5: 3 su A Zacinto, 2 su Alla sera)
+        { module: "Sonetti", text: "[A Zacinto] A cosa paragona Foscolo il proprio esilio?", options: ["Esilio di Dante", "Esilio di Ulisse", "Esilio di Enea", "Esilio di Ovidio"], correct: 1 },
+        
+        { module: "Sonetti", text: "[A Zacinto] Cosa poté fare Ulisse che Foscolo non potrà mai fare?", options: ["Scrivere un poema", "Rivedere la sua patria (Itaca)", "Combattere un'ultima battaglia", "Morire in mare"], correct: 1 },
+        { module: "Sonetti", text: "[Alla sera] A cosa paragona Foscolo la sera?", options: ["Alla primavera", "All'amore", "All'immagine della morte", "Alla gloria"], correct: 2 },
+        { module: "Sonetti", text: "[Alla sera] Cosa 'dorme' nella chiusa del sonetto?", options: ["L'amore", "La speranza", "Lo 'spirto guerrier' che rugge dentro il poeta", "La ragione"], correct: 2 },
+		{ module: "Sonetti", text: "[Alla sera] Qual è l'incipit del sonetto?", options: ["Forse perché della fatal quïete", "Né più mai toccherò le sacre sponde", "Un dì, s’io non andrò sempre fuggendo", "Alla sera, o quella sera..."], correct: 1 },
+		{ module: "Sonetti", text: "[Alla sera] Quale verso conclude il sonetto?", options: ["O materna mia terra", "Quello spirto guerrier ch’entro mi rugge", "E mentre io guardo la tua pace, dorme", "Tu non altro che il canto avrai del figlio"], correct: 3 },
+		{ module: "Sonetti", text: "[Alla sera] Cosa placa la quiete notturna secondo il sonetto?", options: ["La fame", "La sete di giustizia", "Le tempeste interiori del poeta", "La guerra"], correct: 3 },
+		{ module: "Sonetti", text: "[Alla sera] Come si definisce il “nulla eterno” nel sonetto?", options: ["Come una condanna", " Come preferibile al dolore della vita", "Come una punizione divina", "Come un’illusione"], correct: 2 },
+		
+        // LE GRAZIE (5)
+        { module: "Le Grazie", text: "*Le Grazie* è un'opera:", options: ["Completata e pubblicata da Foscolo", "Incompiuta", "Teatrale", "Epica"], correct: 1 },
+        { module: "Le Grazie", text: "Quali figure mitologiche vengono celebrate?", options: ["Le Muse", "Le tre Grazie (Aglaia, Eufrosine, Talia)", "Le Parche", "Le Ore"], correct: 1 },
+        { module: "Le Grazie", text: "Cosa rappresenta la bellezza per Foscolo in *Le Grazie*?", options: ["Un semplice ornamento", "Una forza che rende l'uomo più civile e armonioso", "Un'illusione ingannevole", "Un simbolo religioso"], correct: 1 },
+        { module: "Le Grazie", text: "A quale mondo si ispira principalmente Foscolo in quest'opera?", options: ["Medioevo cristiano", "Rinascimento italiano", "Mondo classico (Grecia)", "Illuminismo francese"], correct: 2 },
+        
+    ];
+
+    // Stato risposte: array di -1 (non risposto) o indice scelto
+    let userAnswers = new Array(questionsDB.length).fill(-1);
+    let feedbacksShown = new Array(questionsDB.length).fill(false); // per feedback visivi dopo submit
+
+    // Riferimenti DOM
+    const container = document.getElementById('quizContainer');
+    const resultPanel = document.getElementById('resultPanel');
+    const submitBtn = document.getElementById('submitAllBtn');
+    const resetBtn = document.getElementById('resetAllBtn');
+
+    // Renderizza l'intero elenco delle domande
+    function renderQuestions() {
+        let html = `<div style="margin-bottom: 1rem;"><span style="background:#22c55e30; padding:0.2rem 1rem; border-radius:40px;"> Totale domande: ${questionsDB.length}</span></div>`;
+        questionsDB.forEach((q, idx) => {
+            const selectedVal = userAnswers[idx];
+            html += `<div class="question-block" data-qidx="${idx}">`;
+            html += `<div class="tag-module"> ${q.module}</div>`;
+            html += `<div class="question-text">${idx+1}. ${q.text}</div>`;
+            html += `<div class="options-row" id="opts-${idx}">`;
+            q.options.forEach((opt, optIdx) => {
+                const isChecked = (selectedVal === optIdx);
+                html += `
+                    <label class="opt-label" data-qidx="${idx}" data-optidx="${optIdx}">
+                        <input type="radio" name="q${idx}" value="${optIdx}" ${isChecked ? 'checked' : ''}>
+                        <span>${String.fromCharCode(65+optIdx)}. ${opt}</span>
+                    </label>
+                `;
+            });
+            html += `</div>`;
+            // feedback area
+            html += `<div id="fb-${idx}" class="feedback-single"></div>`;
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+
+        // Attacca event listeners: cambio radio + clic sull'etichetta (già gestito col label ma per sicurezza)
+        for (let i = 0; i < questionsDB.length; i++) {
+            const radios = document.querySelectorAll(`input[name="q${i}"]`);
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const val = parseInt(e.target.value);
+                    userAnswers[i] = val;
+                    // se cambia risposta e avevamo già mostrato feedback, rimuoviamo il feedback visivo per pulizia
+                    const fbDiv = document.getElementById(`fb-${i}`);
+                    if(fbDiv) fbDiv.innerHTML = '';
+                    feedbacksShown[i] = false;
+                });
+            });
+            // rendi cliccabile tutta l'area opt-label
+            const labels = document.querySelectorAll(`.opt-label[data-qidx="${i}"]`);
+            labels.forEach(label => {
+                label.addEventListener('click', (e) => {
+                    const radio = label.querySelector('input[type="radio"]');
+                    if(radio && !radio.checked) {
+                        radio.checked = true;
+                        const changeEvent = new Event('change', { bubbles: true });
+                        radio.dispatchEvent(changeEvent);
+                    }
+                });
+            });
+        }
+    }
+
+    // Calcola punteggio e restituisce oggetto dettagliato per modulo e per domanda errata
+    function computeResults() {
+        let totalCorrect = 0;
+        let moduleStats = { "Ortis": { total: 0, correct: 0, wrongIds: [] },
+                            "Dei Sepolcri": { total: 0, correct: 0, wrongIds: [] },
+                            "Sonetti": { total: 0, correct: 0, wrongIds: [] },
+                            "Le Grazie": { total: 0, correct: 0, wrongIds: [] } };
+        
+        for (let i = 0; i < questionsDB.length; i++) {
+            const q = questionsDB[i];
+            const user = userAnswers[i];
+            const isCorrect = (user !== -1 && user === q.correct);
+            if(isCorrect) totalCorrect++;
+            // aggiorna stats modulo
+            const mod = q.module;
+            moduleStats[mod].total++;
+            if(isCorrect) moduleStats[mod].correct++;
+            else moduleStats[mod].wrongIds.push(i);
+        }
+        const percentage = (totalCorrect / questionsDB.length) * 100;
+        return { totalCorrect, totalQuestions: questionsDB.length, percentage, moduleStats };
+    }
+
+    // Mostra feedback singoli sotto ogni domanda (corretto/sbagliato + spiegazione)
+    function showDetailedFeedbacks() {
+        for (let i = 0; i < questionsDB.length; i++) {
+            const q = questionsDB[i];
+            const user = userAnswers[i];
+            const fbDiv = document.getElementById(`fb-${i}`);
+            if(!fbDiv) continue;
+            if(user === -1) {
+                fbDiv.innerHTML = `<span>Non risposta. La risposta corretta era ${String.fromCharCode(65+q.correct)}. ${q.options[q.correct]}</span>`;
+                fbDiv.className = "feedback-single wrong-feedback";
+            } else if(user === q.correct) {
+                fbDiv.innerHTML = `<span> Corretto!</span>`;
+                fbDiv.className = "feedback-single correct-feedback";
+            } else {
+                const correctLetter = String.fromCharCode(65+q.correct);
+                fbDiv.innerHTML = `<span> Sbagliato. La risposta corretta era ${correctLetter}: ${q.options[q.correct]}</span>`;
+                fbDiv.className = "feedback-single wrong-feedback";
+            }
+            feedbacksShown[i] = true;
+        }
+    }
+
+    // genera la valutazione e i consigli in base ai risultati
+    function generateEvaluationAndTips(results) {
+        const { totalCorrect, totalQuestions, percentage, moduleStats } = results;
+        let evaluationText = "";
+        let insufficientModules = [];
+        let strengths = [];
+        
+        if (percentage >= 90) evaluationText = " Eccellente! Hai una padronanza straordinaria delle opere di Foscolo. Ottima preparazione.";
+        else if (percentage >= 75) evaluationText = " Buon lavoro! Conosci bene i contenuti principali, ma qualche dettaglio può essere approfondito.";
+        else if (percentage >= 55) evaluationText = " Discreto, ma non ancora solido. Alcune aree vanno rinforzate con lo studio mirato.";
+        else if (percentage >= 35) evaluationText = " Quasi sufficiente. Molti errori rivelano lacune significative. Ti consigliamo un ripasso strutturato.";
+        else evaluationText = " Insufficiente. È necessario rivedere completamente gli argomenti. Segui i consigli qui sotto.";
+        
+        // analisi moduli
+        for (let [mod, stats] of Object.entries(moduleStats)) {
+            const modPerf = (stats.correct / stats.total) * 100;
+            if (modPerf < 60) insufficientModules.push(mod);
+            if (modPerf >= 80) strengths.push(mod);
+        }
+        
+        // costruzione HTML resultPanel
+        let html = `<div class="score-badge"> Punteggio finale: ${totalCorrect} / ${totalQuestions} (${Math.round(percentage)}%)</div>`;
+        html += `<div class="evaluation-text"><strong> Valutazione:</strong> ${evaluationText}</div>`;
+        
+        // punti deboli per modulo
+        if (insufficientModules.length > 0) {
+            html += `<div class="review-section"><h3> Dove hai incontrato più difficoltà?</h3><ul class="review-list">`;
+            insufficientModules.forEach(mod => {
+                html += `<li><strong>${mod}</strong> – meno del 60% di risposte corrette. Rivedi i concetti chiave.</li>`;
+            });
+            html += `</ul></div>`;
+        } else {
+            html += `<div class="review-section"><h3> Punti di forza</h3><p>Hai mostrato ottima competenza in tutti i moduli (${strengths.join(", ")}). Ottimo lavoro!</p></div>`;
+        }
+        
+        // consigli di ripasso personalizzati (in base agli errori specifici per modulo)
+        html += `<div class="review-section"><h3> Cosa puoi rivedere per migliorare</h3><ul class="review-list">`;
+        
+        if (moduleStats["Ortis"].wrongIds.length > 0) {
+            html += `<li>🔹 <strong>Jacopo Ortis</strong>: ripassa il contesto storico (Campoformio), la struttura epistolare e le caratteristiche dell'eroe romantico. Il romanzo è il simbolo del crollo degli ideali rivoluzionari.</li>`;
+        }
+        if (moduleStats["Dei Sepolcri"].wrongIds.length > 0) {
+            html += `<li>🔹 <strong>Dei Sepolcri</strong>: concentrati sull'editto di Saint-Cloud, sul valore civile delle tombe e sul ruolo di Santa Croce come tempio della memoria. Non dimenticare i grandi spiriti (Machiavelli, Michelangelo, Galileo).</li>`;
+        }
+        if (moduleStats["Sonetti"].wrongIds.length > 0) {
+            html += `<li>🔹 <strong>Sonetti (A Zacinto / Alla sera)</strong>: rivedi il paragone con Ulisse, l'esilio senza ritorno e la personificazione della sera come immagine della morte. Ricorda l'opposizione tra "nulla eterno" e dolore della vita.</li>`;
+        }
+        if (moduleStats["Le Grazie"].wrongIds.length > 0) {
+            html += `<li>🔹 <strong>Le Grazie</strong>: studia l'incompletezza dell'opera, il valore della bellezza come forza civilizzatrice e l'ispirazione al mondo classico (tre Grazie Aglaia, Eufrosine, Talia).</li>`;
+        }
+        if (totalCorrect === totalQuestions) {
+            html += `<li> Sei già preparatissimo! Per approfondire, leggi direttamente i passi scelti dei Sepolcri e dei Sonetti.</li>`;
+        } else if (percentage < 50) {
+            html += `<li> <strong>Ripasso generale consigliato</strong>: riprendi la scheda su Foscolo: vita, opere, contesto storico. Concentrati prima su Ortis (romanzo manifesto) e Dei Sepolcri (poema civile).</li>`;
+        }
+        html += `</ul>`;
+        html += `<hr><p> <em>“La poesia di Foscolo insegna che la memoria è l'unica vera immortalità.”</em> Ripassa con calma e riprova il quiz!</p>`;
+        html += `</div>`;
+        return html;
+    }
+    
+    // Azione di correzione completa
+    function evaluateAndShow() {
+        // Prima controlla se alcune domande non hanno risposta, ma va bene.
+        const results = computeResults();
+        // Mostra i feedback dettagliati sotto ogni domanda
+        showDetailedFeedbacks();
+        // Genera pannello valutazione
+        const evaluationHtml = generateEvaluationAndTips(results);
+        resultPanel.style.display = "block";
+        resultPanel.innerHTML = evaluationHtml;
+        // Scorri dolcemente verso il risultato
+        resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    
+    function resetAll() {
+        // resetta array risposte
+        for (let i = 0; i < userAnswers.length; i++) {
+            userAnswers[i] = -1;
+            feedbacksShown[i] = false;
+        }
+        // ricostruisce l'interfaccia
+        renderQuestions();
+        // nasconde il pannello dei risultati
+        resultPanel.style.display = "none";
+        // pulisce eventuali feedback già mostrati ma ricostruzione li rimuove
+    }
+
+    // EVENTI
+    submitBtn.addEventListener('click', evaluateAndShow);
+    resetBtn.addEventListener('click', resetAll);
+    
+    // Avvio
+    renderQuestions();
+</script>
+</body>
+</html>

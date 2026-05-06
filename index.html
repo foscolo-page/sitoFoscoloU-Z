@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+<meta charset="UTF-8">
+<title>Ugo Foscolo - Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Montserrat;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0}
+header{text-align:center;padding:50px;background:linear-gradient(90deg,#6366f1,#22c55e)}
+section{padding:40px;max-width:1100px;margin:auto}
+.cards{display:flex;gap:20px;flex-wrap:wrap}
+.card{flex:1;min-width:250px;background:#1e293b;padding:20px;border-radius:15px;cursor:pointer;transition:.3s}
+.card:hover{transform:translateY(-10px) scale(1.05);background:#334155}
+button{padding:12px 15px;border:none;background:#22c55e;color:#fff;border-radius:8px;cursor:pointer;margin:5px;font-size:16px}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);justify-content:center;align-items:center}
+.modal-content{background:#0f172a;padding:20px;border-radius:15px;max-width:800px;max-height:90%;overflow-y:auto}
+.close{float:right;cursor:pointer;color:red;font-size:24px;font-weight:bold}
+.gallery img{width:100%;margin:10px 0;border-radius:10px;max-width:300px;display:block}
+.linkgame{display:inline-block;margin-top:20px;padding:15px;background:#6366f1;border-radius:10px;text-decoration:none;color:white}
+.gamebox{margin-top:20px}
+</style>
+</head>
+<body>
+<div class="dot-nav">
+  <span class="dot active" onclick="scrollToSection(0)"></span>
+  <span class="dot" onclick="scrollToSection(1)"></span>
+  <span class="dot" onclick="scrollToSection(2)"></span>
+</div>
+
+<header>
+
+<h1>Ugo Foscolo</h1>
+<p>Sito multimediale interattivo</p>
+<style>
+body{
+  margin:0;
+  font-family:Montserrat;
+  color:#e2e8f0;
+
+  /* sfondo storico: manoscritti + carta antica */
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.92)),
+    url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1920&q=80')
+    no-repeat center center fixed;
+
+  background-size: cover;
+}
+body::before{
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03), transparent 50%);
+
+  mix-blend-mode: overlay;
+}
+/* ===== CTA SECTION ===== */
+.cta-section{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:80px 20px;
+}
+
+.cta-box{
+  background: linear-gradient(135deg,#6366f1,#22c55e);
+  padding:50px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+
+  transform:scale(0.9);
+  opacity:0;
+  animation: ctaIn 1s ease forwards;
+}
+
+@keyframes ctaIn{
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+.cta-box h2{
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.cta-box p{
+  opacity:0.9;
+  margin-bottom:25px;
+}
+
+/* BOTTONE FIGO */
+.cta-btn{
+  display:inline-block;
+  padding:16px 30px;
+  font-size:18px;
+  border-radius:12px;
+  text-decoration:none;
+  color:white;
+
+  background:#0f172a;
+  transition:0.3s;
+  position:relative;
+  overflow:hidden;
+}
+
+/* glow */
+.cta-btn::after{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  top:0;
+  left:-100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,0.3),transparent);
+  transition:0.5s;
+}
+
+.cta-btn:hover::after{
+  left:100%;
+}
+
+.cta-btn:hover{
+  transform:scale(1.08);
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* ===== TRANSIZIONE PAGINA ===== */
+#transition-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#0f172a;
+  z-index:9999;
+
+  opacity:0;
+  pointer-events:none;
+  transition:0.5s;
+}
+
+#transition-overlay.active{
+  opacity:1;
+}
+/* ===== PAGE LOAD ===== */
+@keyframes pageLoad {
+  to { opacity:1; }
+}
+
+/* ===== HEADER ===== */
+header{
+  text-align:center;
+  padding:70px 20px;
+
+  /* marmo / biblioteca classica */
+  background:
+    linear-gradient(rgba(15, 18, 28, 0.78), rgba(10, 12, 20, 0.92)),
+    url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1920&q=80')
+    no-repeat center center;
+
+  background-size: cover;
+
+  border-bottom: 2px solid rgba(255,255,255,0.08);
+}
+/* ===== SECTIONS ===== */
+section{
+  padding:40px;
+  max-width:1100px;
+  margin:auto;
+
+  opacity:0;
+  transform:translateY(40px);
+  animation: fadeUp 0.8s ease forwards;
+}
+
+section:nth-of-type(1){animation-delay:0.2s;}
+section:nth-of-type(2){animation-delay:0.4s;}
+section:nth-of-type(3){animation-delay:0.6s;}
+
+@keyframes fadeUp {
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* ===== CARDS ===== */
+.card{
+  flex:1;
+  min-width:250px;
+  background:#1e293b;
+  padding:20px;
+  border-radius:15px;
+  cursor:pointer;
+
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* effetto hover principale */
+.card:hover{
+  transform: translateY(-12px) scale(1.06);
+  background: #334155;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+/* luce animata */
+.card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition:0.5s;
+}
+
+/* scorrimento luce */
+.card:hover::before{
+  left:100%;
+}
+
+/* titolo più dinamico */
+.card h3{
+  transition:0.3s;
+}
+
+.card:hover h3{
+  color:#22c55e;
+  transform: translateX(5px);
+}
+
+/* piccolo movimento del testo */
+.card p{
+  transition:0.3s;
+}
+
+.card:hover p{
+  opacity:0.9;
+  transform: translateX(3px);
+}
+
+/* ===== BUTTONS ===== */
+button{
+  padding:12px 15px;
+  border:none;
+  background:#22c55e;
+  color:#fff;
+  border-radius:8px;
+  cursor:pointer;
+  margin:5px;
+  font-size:16px;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+/* ===== MODAL ===== */
+.modal{
+  display:none;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,.8);
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:#0f172a;
+  padding:20px;
+  border-radius:15px;
+  max-width:800px;
+  max-height:90%;
+  overflow-y:auto;
+
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn{
+  from{transform:scale(0.8);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+
+.close{
+  float:right;
+  cursor:pointer;
+  color:red;
+  font-size:24px;
+  font-weight:bold;
+}
+.img-row{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:40px;
+  margin-top:30px;
+  flex-wrap:wrap;
+}
+
+.img-row img{
+  width:220px;
+  height:auto;
+  border-radius:12px;
+}
+/* ===== GAME ===== */
+.gamebox{
+  margin-top:20px;
+}
+
+.linkgame{
+  display:inline-block;
+  margin-top:20px;
+  padding:15px;
+  background:#6366f1;
+  border-radius:10px;
+  text-decoration:none;
+  color:white;
+}
+.opera {
+  display: none;
+  padding: 30px;
+}
+
+.opera.active {
+  display: block;
+}
+
+.menu button {
+  margin: 10px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+#viewer {
+  padding: 40px;
+  max-width: 1100px;
+  margin: auto;
+  animation: fade 0.4s ease;
+}
+
+@keyframes fade {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+
+</style>
+</header>
+
+<section>
+<h1>Vita di Foscolo</h1>
+<p>Ugo Foscolo (1778-1827) è stato uno dei padri del Romanticismo italiano, poeta, romanziere e patriota. Nato a Zante (allora Repubblica di Venezia) da padre italiano e madre greca, Foscolo visse fin dall’infanzia il conflitto tra appartenenza e sradicamento.
+<br>
+<b>La formazione e le speranze giovanili:</b>
+<br>
+Studiò a Venezia e a Padova. Inizialmente fervente seguace di Napoleone Bonaparte, vide nel generale francese il liberatore dell’Italia dal dominio austriaco.
+<br>
+<b>Il crollo degli ideali:</b>
+<br>
+Nel 1797 Napoleone cedette Venezia all'Austria con il trattato di Campoformio. Questo tradimento segnò profondamente Foscolo, trasformando il suo entusiasmo rivoluzionario in una disillusione dolorosa e definitiva.
+<br>
+<b>L'esilio e la morte lontano dalla patria:</b>
+<br>
+Costretto all'esilio per le sue idee politiche, si rifugiò in Inghilterra, dove morì povero e malato a Turnham Green (Londra) nel 1827. Solo nel 1871 le sue spoglie furono traslate a Firenze, nella Basilica di Santa Croce, accanto ai grandi italiani come Michelangelo e Galileo.</p>
+<div class="img-row">
+  <img src="Ugo_Foscolo.jpg">
+  <img src="download.jpg">
+  <img src="David_-_Napoleon_crossing_the_Alps_-_Malmaison1.jpg">
+</div>
+<div style="clear:both"
+
+}></div>
+</section>
+
+<section>
+<h2>Opere più celebri - clicca se vuoi saperne di più</h2>
+<div class="cards">
+<div class="card" onclick="openModal('ortis')"><h3>Ortis</h3><p>Romanzo epistolare</p></div>
+<div class="card" onclick="openModal('sepolcri')"><h3>Sepolcri</h3><p>Poema civico</p></div>
+<div class="card" onclick="openModal('sonetti')"><h3>Sonetti</h3><p>Liriche immortali</p></div>
+<div class="card" onclick="openModal('Le Grazie')"><h3>Le Grazie</h3><p>Poema ispirato alla mitologia</p></div>
+</div>
+</section>
+<div id="viewer">
+</div>
+
+<section class="cta-section">
+  <div class="cta-box">
+  
+    <h2>Metti alla prova le tue conoscenze</h2>
+    <p>Sei pronto a sfidare il tuo sapere su Foscolo?</p>
+
+    <a class="cta-btn" href="gioco.html" onclick="startTransition(event)">
+      Inizia il gioco
+    </a>
+  </div>
+</section>
+
+
+<!-- OVERLAY TRANSIZIONE -->
+<div id="transition-overlay"></div>
+
+<div id="modal" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal()">&times;</span>
+<div id="modalText"></div>
+</div>
+</div>
+
+
+	
+
+
+<script>
+// Funzione per aprire il modale con i contenuti corretti
+function openModal(type){
+    const textDiv = document.getElementById('modalText');
+	const viewer = document.getElementById('viewer');
+
+    if(type === 'sepolcri'){
+        content = `<h2>Dei Sepolcri</h2>
+        <p>Composto nel 1807, il carme Dei Sepolcri è il poema più alto e originale di Foscolo. Fu scritto in reazione all’editto napoleonico di Saint-Cloud, che imponeva l’uniformità delle tombe fuori dalle mura cittadine.
+	<br>
+	<b>Tesi centrale:</b>
+	Foscolo non difende le superstizioni religiose, ma la funzione civile della sepoltura. Secondo lui, le tombe non servono ai morti (che non sentono nulla), ma ai vivi. Esse sono il luogo della memoria familiare e nazionale.
+	Solo dove esistono sepolcri gloriosi – come Santa Croce a Firenze – gli eroi del passato (Machiavelli, Michelangelo, Galileo) possono ispirare il futuro. In assenza di una tomba, l’uomo perde il contatto con i propri padri e con la propria identità.</p>
+        <div class='gallery'>
+            <img src="arton156069.jpg">
+            <p><em>"A euterpe, o dea, chiami? A euterpe? A euterpe? Non io, ché al suon de’ tuoi dolcissimi canti ..."</em></p>
+        </div>
+        <!-- Video con copertina cliccabile (thumbnail di YouTube) - SEPOLCRI -->
+        <a href="https://www.youtube.com/watch?v=IKS1gYXxBN8" target="_blank" style="display: block; text-align: center; text-decoration: none;">
+            <img src="https://img.youtube.com/vi/IKS1gYXxBN8/hqdefault.jpg" alt="Video Dei Sepolcri" style="width:100%; max-width:480px; border-radius:10px; margin-top:10px; cursor:pointer; border:2px solid #22c55e;">
+		<br>
+            <span style="display: inline-block; margin-top: 8px; background:#22c55e; color:white; padding:6px 12px; border-radius:20px; font-size:14px;">▶ Clicca per guardare su YouTube</span>
+        </a>`;
+    }
+    else if(type === 'ortis'){
+        content = `<h2>Ultime lettere di Jacopo Ortis</h2>
+        <p>Capolavoro della narrativa italiana, Le ultime lettere di Jacopo Ortis (1802/1817) è un romanzo epistolare che fonde l’amore infelice con la disperazione politica.
+		<br>
+		
+		<b>Trama:</b>
+		Jacopo Ortis, giovane patriota, si uccide perché perseguitato politicamente e respinto in amore da Teresa, 
+		promessa a un uomo mediocre. Le sue lettere all’amico Lorenzo Alderani raccontano un’Italia oppressa dagli stranieri.
+		<br>
+		
+		<b>Interpretazione:</b>
+		Più che una semplice imitazione del Werther di Goethe, l’Ortis è il primo grande romanzo “civile” italiano. 
+		Foscolo non scrive solo di un suicidio d’amore, ma del suicidio di un’intera generazione che ha visto crollare i propri ideali di libertà e giustizia. 
+		Il romanzo divenne il manifesto del pessimismo romantico italiano.</p>
+		
+		<b>Contesto storico:</b>
+		Il romanzo nasce in un periodo di forte crisi politica per l’Italia. 
+		Foscolo è molto deluso dal trattato di Campoformio (1797), con cui Napoleone cede Venezia all’Austria. 
+		Questo evento spegne le speranze di libertà e porta nell’opera un clima di oppressione e disillusione.
+		<br>
+		
+		<b>Forza epistolare:</b>
+		L’opera è scritta interamente sotto forma di lettere. Jacopo scrive all’amico Lorenzo Alderani, 
+		che dopo la sua morte raccoglie e ordina tutte le lettere. In questo modo il lettore entra direttamente 
+		nei pensieri e nei sentimenti del protagonista.
+		
+		<b>Eroe romantico:</b>
+		Jacopo Ortis è un tipico eroe romantico: è sensibile, appassionato e in continuo conflitto con la società e con il destino. 
+		Non riesce a conciliare i suoi ideali di libertà con la realtà che lo circonda e per questo arriva al suicidio.
+		<br>
+		
+		<b>Il crollo emotivo:</b>
+		Un momento decisivo è il trattato di Campoformio: Napoleone tradisce Venezia cedendola all’Austria. 
+		Questo fatto distrugge le speranze patriottiche di Jacopo e rappresenta il crollo definitivo dei suoi ideali di libertà e indipendenza.
+	
+        <div class='gallery'>
+            <img src="Patini_Morte_di_Jacopo_Ortis.jpg" alt="Morte di Jacopo Ortis - dipinto di Patini">
+        </div>
+        <!-- NUOVO VIDEO AGGIUNTO PER ORTIS -->
+        <a href="https://www.youtube.com/watch?v=em4jg_oiS-8" target="_blank" style="display: block; text-align: center; text-decoration: none;">
+            <img src="https://img.youtube.com/vi/em4jg_oiS-8/hqdefault.jpg"  div align = center alt="Video Le ultime lettere di Jacopo Ortis 1973" style="width:100%; max-width:480px; border-radius:10px; margin-top:10px; cursor:pointer; border:2px solid #22c55e;">
+            <span style="display: inline-block; margin-top: 8px; background:#22c55e; color:white; padding:6px 12px; border-radius:20px; font-size:14px;">▶ Clicca per guardare il video su YouTube</span>
+        </a>`;
+    }
+    else if(type === 'sonetti'){
+        content = `
+    <h2>Sonetti</h2>
+    <p>Scegli un sonetto che ti piacerebbe conoscere:</p>
+
+    <div class="cards">
+        <div class="card" onclick="openSonetto('zacinto')">
+            <h3>A Zacinto</h3>
+        </div>
+
+        <div class="card" onclick="openSonetto('sera')">
+            <h3>Alla sera</h3>
+        </div>
+    </div>
+
+    <div id="sonettoContent"></div>
+    `;
+	
+    }
+	
+    
+	viewer.innerHTML = content;
+}
+function openSonetto(tipo){
+    const content = document.getElementById('sonettoContent');
+
+    if(tipo === 'zacinto'){
+        content.innerHTML = `
+        <h3>A Zacinto</h3>
+        <p><em>	Né più mai toccherò le sacre sponde<br>
+      				ove il mio corpo fanciulletto giacque,<br>
+       				Zacinto mia, che te specchi nell’onde<br>
+       				del greco mar da cui vergine nacque<br>
+				<br>
+	      			Venere, e fea quelle isole feconde<br>
+       				col suo primo sorriso, onde non tacque<br>
+      			 	le tue limpide nubi e le tue fronde<br>
+      			 	l’inclito verso di colui che l’acque<br>
+				<br>
+       				cantò fatali, ed il diverso esiglio<br>
+   				per cui bello di fama e di sventura<br>
+       				baciò la sua petrosa Itaca Ulisse.<br>
+				<br>
+       				Tu non altro che il canto avrai del figlio,<br>
+       				o materna mia terra; a noi prescrisse<br>
+       				il fato illacrimata sepoltura.</em></p>
+        <p>Il sonetto più struggente di Foscolo. Il poeta paragona il proprio esilio a quello di Ulisse. Ulisse però poté rivedere la sua Itaca, mentre Foscolo non rivedrà mai Zante, l’isola natale dove è nata Venere. La sua unica consolazione è che i versi 				canteranno quell’isola per sempre.
+	</p>
+        `;
+    }
+
+    else if(tipo === 'sera'){
+        content.innerHTML = `
+        <h3>Alla sera</h3>
+        <p><em>	Forse perché della fatal quïete<br>
+				Tu sei l'immago, a me sí cara vieni,<br>
+				O Sera! E quando ti corteggian liete<br>
+				Le nubi estive e i zeffiri sereni,<br>
+				<br>
+				E quando dal nevoso aere inquïete<br>
+				Tenebre e lunghe all’universo meni,<br>
+				Sempre scendi invocata, e le secrete<br>
+				Vie del mio cor soavemente tieni.<br>
+				<br>
+				Vagar mi fai co'miei pensier su l'orme<br>
+				Che vanno al nulla eterno; e intanto fugge<br>
+				Questo reo tempo, e van con lui le torme<br>
+				<br>
+				Delle cure onde meco egli si strugge;<br>
+				E mentre io guardo la tua pace, dorme<br>
+				Quello spirto guerrier ch'entro mi rugge.<br>
+	</em></p>
+        <p>Foscolo si rivolge alla sera come a un'immagine della morte. La quiete notturna è l'unica capace di placare le sue tempeste interiori. Il sonetto si chiude con una contrapposizione: il “nulla eterno” (la morte) è preferibile al dolore della vita.</p>
+        `;
+    }
+}
+function closeModal(){
+    document.getElementById('modal').style.display = 'none';
+}
+</script>
+<script>
+// 1. Funzione per il suono
+function playClickSound() {
+    const audio = document.getElementById("clickSound");
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Audio bloccato dal browser"));
+    }
+}
+
+// 2. Delegazione eventi: gestisce il suono per TUTTI i click (anche quelli dinamici)
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.card, button, .cta-btn, .close');
+    if (target) {
+        playClickSound();
+    }
+});
+
+// 3. Le tue funzioni originali per i contenuti
+function openModal(type){
+    
+    const textDiv = document.getElementById('modalText');
+	const viewer = document.getElementById('viewer');
+
+    if(type === 'sepolcri'){
+        content = `
+		<br>
+		Clicca su questo audio se vuoi scoprire su Dei Sepolcri
+		<br>
+		<br>
+		<audio controls>
+			  <source src="Dei Sepolcri.m4a" type="audio/mpeg">
+			  Il tuo browser non supporta l’audio.
+			</audio>
+		<h2>Dei Sepolcri</h2>
+        Il carme Dei Sepolcri, composto nel 1807, è considerato il poema più alto e originale di Foscolo. Nasce in risposta all’editto napoleonico di Saint-Cloud, che imponeva uniformità e anonimato delle sepolture fuori dalle città.
+		<br>
+		</br>
+		La tesi centrale non riguarda la religione, ma la funzione civile delle tombe: esse non servono ai morti, che non hanno più coscienza, ma ai vivi. Le sepolture conservano la memoria affettiva e storica e creano l’illusione che i defunti continuino a vivere nel ricordo.
+		<br>
+		</br>
+		In questo senso, i sepolcri diventano fondamentali per la costruzione dell’identità personale e nazionale. Nei luoghi della memoria, come Santa Croce a Firenze, gli uomini illustri (Machiavelli, Michelangelo, Galileo) continuano a ispirare le generazioni future. Senza memoria e sepolture, l’uomo si stacca dalle proprie radici e dalla propria storia.
+		
+        <div class='gallery'>
+		
+            <img src="arton156069.jpg">
+            <p><em>"A euterpe, o dea, chiami? A euterpe? A euterpe? Non io, ché al suon de’ tuoi dolcissimi canti ..."</em></p>
+        </div>
+        <!-- Video con copertina cliccabile (thumbnail di YouTube) - SEPOLCRI -->
+        <a href="https://www.youtube.com/watch?v=IKS1gYXxBN8" target="_blank" style="display: block; text-align: left; text-decoration: none;">
+            <img src="https://img.youtube.com/vi/IKS1gYXxBN8/hqdefault.jpg" alt="Video Dei Sepolcri" style="width:100%; max-width:480px; border-radius:10px; margin-top:10px; cursor:pointer; border:2px solid #22c55e;">
+			
+		<br>
+            <span style="display: inline-block; margin-top: 8px; background:#22c55e; color:white; padding:6px 12px; border-radius:20px; font-size:14px;">▶ Clicca per guardare su YouTube</span>
+        </a>`;
+    }
+    else if(type === 'ortis'){
+        content = `
+		<br>
+		Clicca su questo audio se vuoi scoprire su Ortis
+		<br>
+		<br>
+		<audio controls>
+			  <source src="Ortis.m4a" type="audio/mpeg">
+			  Il tuo browser non supporta l’audio.
+			</audio>
+		<h2>Ultime lettere di Jacopo Ortis</h2>
+
+		<p>
+		Capolavoro della narrativa italiana, è un romanzo epistolare che fonde amore e politica.
+		<h3>Trama</h3>
+		<p>
+		Jacopo Ortis, giovane patriota, si suicida per la persecuzione politica e per l’amore impossibile per Teresa, promessa a un altro uomo.
+		Le lettere a Lorenzo Alderani raccontano un’Italia oppressa dagli stranieri.
+		
+		<h3>Interpretazione</h3>
+		<p>
+		Non è solo un’opera sul suicidio amoroso, ma il simbolo del crollo degli ideali rivoluzionari.
+		È il manifesto del pessimismo romantico italiano.
+		</p>
+		<b>Contesto storico:</b>
+		Il romanzo nasce in un periodo di forte crisi politica per l’Italia. 
+		Foscolo è molto deluso dal trattato di Campoformio (1797), con cui Napoleone cede Venezia all’Austria. 
+		Questo evento spegne le speranze di libertà e porta nell’opera un clima di oppressione e disillusione.
+		<br>
+		
+		<b>Forza epistolare:</b>
+		<br>
+		L’opera è scritta interamente sotto forma di lettere. Jacopo scrive all’amico Lorenzo Alderani, 
+		che dopo la sua morte raccoglie e ordina tutte le lettere. In questo modo il lettore entra direttamente 
+		nei pensieri e nei sentimenti del protagonista.
+		<br>
+		
+		<b>Eroe romantico:</b>
+		<br>
+		Jacopo Ortis è un tipico eroe romantico: è sensibile, appassionato e in continuo conflitto con la società e con il destino. 
+		Non riesce a conciliare i suoi ideali di libertà con la realtà che lo circonda e per questo arriva al suicidio.
+		<br>
+		
+		<b>Il crollo emotivo:</b>
+		<br>
+		Un momento decisivo è il trattato di Campoformio: Napoleone tradisce Venezia cedendola all’Austria. 
+		Questo fatto distrugge le speranze patriottiche di Jacopo e rappresenta il crollo definitivo dei suoi ideali di libertà e indipendenza.
+		<blockquote>
+		“Il romanzo di una generazione senza patria e senza speranza.”
+		</blockquote>
+        <div class='gallery'>
+            <img src="Patini_Morte_di_Jacopo_Ortis.jpg" alt="Morte di Jacopo Ortis - dipinto di Patini">
+        </div>
+        <!-- NUOVO VIDEO AGGIUNTO PER ORTIS -->
+        <a href="https://www.youtube.com/watch?v=em4jg_oiS-8" target="_blank" style="display: block; text-align: left; text-decoration: none;">
+            <img src="https://img.youtube.com/vi/em4jg_oiS-8/hqdefault.jpg" alt="Video Le ultime lettere di Jacopo Ortis 1973" style="width:100%; max-width:480px; border-radius:10px; margin-top:10px; cursor:pointer; border:2px solid #22c55e;">
+		<br>	
+            <span style="display: inline-block; margin-top: 8px; background:#22c55e; color:white; padding:6px 12px; border-radius:20px; font-size:14px;">▶ Clicca per guardare il video su YouTube</span>
+        </a>`;
+    }
+    else if(type === 'sonetti'){
+        content = `
+    <h2>Sonetti</h2>
+    <p>Scegli un sonetto che ti piacerebbe conoscere:</p>
+
+    <div class="cards">
+        <div class="card" onclick="openSonetto('zacinto')">
+            <h3>A Zacinto</h3>
+        </div>
+
+        <div class="card" onclick="openSonetto('sera')">
+            <h3>Alla sera</h3>
+        </div>
+    </div>
+
+    <div id="sonettoContent"></div>
+    `;
+	
+    }
+	else if(type === 'Le Grazie'){
+       content = `
+	   <br>
+		Clicca su questo audio se vuoi scoprire su Le Grazie
+		<br>
+		<br>
+	   <audio controls>
+			  <source src="Le Grazie.m4a" type="audio/mpeg">
+			  Il tuo browser non supporta l’audio.
+			</audio>
+    <h2>Le Grazie</h2>
+    <p>
+	Capolavoro della narrativa italiana, è un romanzo epistolare che fonde amore e politica.
+	</p>
+
+	<h3>Cos'è l'opera</h3>
+	<p>
+	Le Grazie è un’opera incompiuta di Ugo Foscolo, iniziata tra il 1812 e il 1813. 
+	È un poemetto di ispirazione mitologica dedicato alle tre Grazie della tradizione classica: Aglaia, Eufrosine e Talia, simboli di bellezza, armonia e gioia.
+	</p>
+
+	<h3>Il significato della bellezza</h3>
+	<p>
+	Foscolo vuole celebrare la bellezza come forza che rende l’uomo più civile e più equilibrato. 
+	In un mondo dominato da conflitti e passioni, l’arte e la bellezza hanno il compito di portare ordine e serenità.
+	</p>
+	
+	<h3>Il tema principale</h3>
+	<p>
+	Il tema principale è quindi la bellezza come valore positivo: non è solo estetica, 
+	ma qualcosa che migliora l’uomo e lo aiuta a vivere in modo più armonioso.
+	</p>
+	
+	<h3>Il mondo classico</h3>
+	<p>
+	Nell’opera si trovano elementi della mitologia greca e richiami al mondo classico, 
+	perché Foscolo guarda all’antichità come modello ideale di equilibrio e perfezione.
+	</p>
+
+	<blockquote>
+	Le Grazie è rimasta incompiuta, ma mostra bene l’ultimo ideale di Foscolo: usare la bellezza e l’arte per rendere l’uomo più umano e più vicino all’armonia.
+	</blockquote>
+        <div class='gallery'>
+            <img src="Le_tre_Grazie.jpg"">
+        </div>
+			
+            
+        `;
+	
+    }
+    viewer.innerHTML = content;
+}
+function openSonetto(tipo){
+    const content = document.getElementById('sonettoContent');
+
+    if(tipo === 'zacinto'){
+        content.innerHTML =
+		`<br>
+		Clicca su questo audio se vuoi scoprire su A Zacinto
+		<br>
+		<br>
+			
+			<audio controls>
+			  <source src="A Zacinto.m4a" type="audio/mpeg">
+			  Il tuo browser non supporta l’audio.
+			</audio>
+        <h3>A Zacinto</h3>
+        <p><em>	Né più mai toccherò le sacre sponde<br>
+      				ove il mio corpo fanciulletto giacque,<br>
+       				Zacinto mia, che te specchi nell’onde<br>
+       				del greco mar da cui vergine nacque<br>
+				<br>
+	      			Venere, e fea quelle isole feconde<br>
+       				col suo primo sorriso, onde non tacque<br>
+      			 	le tue limpide nubi e le tue fronde<br>
+      			 	l’inclito verso di colui che l’acque<br>
+				<br>
+       				cantò fatali, ed il diverso esiglio<br>
+   				per cui bello di fama e di sventura<br>
+       				baciò la sua petrosa Itaca Ulisse.<br>
+				<br>
+       				Tu non altro che il canto avrai del figlio,<br>
+       				o materna mia terra; a noi prescrisse<br>
+       				il fato illacrimata sepoltura.</em></p>
+        <p>Il sonetto più struggente di Foscolo. Il poeta paragona il proprio esilio a quello di Ulisse. Ulisse però poté rivedere la sua Itaca, mentre Foscolo non rivedrà mai Zante, l’isola natale dove è nata Venere. La sua unica consolazione è che i versi 				canteranno quell’isola per sempre.
+	</p>
+        `;
+    }
+
+    else if(tipo === 'sera'){
+        content.innerHTML = `
+		<br>
+		Clicca su questo audio se vuoi scoprire su Alla sera
+		<br>
+		<br>
+        <audio controls>
+			  <source src="Alla sera.m4a" type="audio/mpeg">
+			  Il tuo browser non supporta l’audio.
+			</audio>
+		<h3>Alla sera</h3>
+        <p><em>	Forse perché della fatal quïete<br>
+				Tu sei l'immago, a me sí cara vieni,<br>
+				O Sera! E quando ti corteggian liete<br>
+				Le nubi estive e i zeffiri sereni,<br>
+				<br>
+				E quando dal nevoso aere inquïete<br>
+				Tenebre e lunghe all’universo meni,<br>
+				Sempre scendi invocata, e le secrete<br>
+				Vie del mio cor soavemente tieni.<br>
+				<br>
+				Vagar mi fai co'miei pensier su l'orme<br>
+				Che vanno al nulla eterno; e intanto fugge<br>
+				Questo reo tempo, e van con lui le torme<br>
+				<br>
+				Delle cure onde meco egli si strugge;<br>
+				E mentre io guardo la tua pace, dorme<br>
+				Quello spirto guerrier ch'entro mi rugge.<br>
+	</em></p>
+        <p>Foscolo si rivolge alla sera come a un'immagine della morte. La quiete notturna è l'unica capace di placare le sue tempeste interiori. Il sonetto si chiude con una contrapposizione: il “nulla eterno” (la morte) è preferibile al dolore della vita.</p>
+        `;
+    }
+}
+function closeModal(){
+    document.getElementById('modal').style.display = 'none';
+}
+
+function startTransition(e){
+    e.preventDefault();
+    const overlay = document.getElementById("transition-overlay");
+    overlay.classList.add("active");
+    setTimeout(() => { window.location.href = e.target.href; }, 500);
+}
+
+</script>
+
+<audio id="clickSound" src="click.mp3" preload="auto"></audio>
+<script>
+function showOpera(id) {
+  const sezioni = document.querySelectorAll('.opera');
+
+  sezioni.forEach(s => {
+    s.classList.remove('active');
+  });
+
+  document.getElementById(id).classList.add('active');
+}
+</script>
+<script>
+const audio = document.getElementById("audioBox");
+
+	audio.style.position = "absolute";
+	audio.style.left = "676570px";
+	audio.style.top = "35675670px";
+</script>
+</body>
+</html>
+
